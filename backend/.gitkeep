@@ -1,0 +1,28 @@
+import boto3
+import json
+import os
+
+bedrock = boto3.client('bedrock-runtime')
+
+def lambda_handler(event, context):
+    user_prompt = event.get('prompt', 'What if Cleopatra met Einstein?')
+    
+    # Call Bedrock Text Model
+    response = bedrock.invoke_model(
+        modelId=os.environ['TEXT_MODEL_ID'],
+        contentType='application/json',
+        accept='application/json',
+        body=json.dumps({"inputText": user_prompt})
+    )
+    text_output = json.loads(response['body'])['outputText']
+    
+    # TODO: Call Bedrock Image Model here if needed
+
+    # Return response
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'story': text_output,
+            # 'image_url': 'S3 path here'
+        })
+    }
